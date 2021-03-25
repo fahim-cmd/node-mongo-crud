@@ -23,8 +23,9 @@ app.get('/', (req, res) => {
 client.connect(err => {
   const collection = client.db("organicdb").collection("product");
   
+  //sob gula product load korsi 
   app.get("/products", (req, res) => {
-    collection.find({}).limit(4)     //sobgula documents amk deo
+    collection.find({})    //.limit(4)     //sobgula documents amk deo
     .toArray((err, documents) => {
       res.send(documents)
     })   //array te convert kore pathay dibo
@@ -43,17 +44,28 @@ client.connect(err => {
     collection.insertOne(product)
     .then(result => {
       console.log('data added successfully')
-      res.send('success')
+      res.redirect('/')
+    })
+  })
+
+  app.patch("/update/:id", (req, res) => {
+    console.log(req.body.price)
+    collection.updateOne({_id: ObjectId(req.params.id)},
+    {
+      $set: { price: req.body.price, quantity: req.body.quantity}
+    })
+    .then(result => {
+      res.send(result.modifiedCount > 0)
     })
   })
 
   app.delete('/delete/:id', (req, res) => {
     collection.deleteOne({_id: ObjectId(req.params.id)})
     .then(result => {
-      console.log(result)
+      res.send(result.deletedCount > 0)
     })
   })
   
 });
 
-app.listen(3000)
+app.listen(4000)
