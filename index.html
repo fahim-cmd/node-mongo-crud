@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1> i have mongodb database yay!!!</h1>
+
+    <form action="/addProduct" method="post">
+        <input type="text" placeholder="name" name="name">
+        <input type="text" placeholder="price" name="price">
+        <input type="text" placeholder="quantity" name="quantity">
+        <button type="submit">submit</button>
+    </form>
+
+    <div id="products">
+
+    </div>
+
+    <div id="update"></div>
+
+    <script>
+
+        function loadProduct() {
+            fetch('/products')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('products');
+                    data.forEach(pd => {
+                        const p = document.createElement('p')
+                        p.innerHTML = `
+                    <strong> ${pd.name} </strong> :-  Price: ${pd.price} Quantity: ${pd.quantity}
+                    <button onclick="updateProduct('${pd._id}')">Update</button>
+                    <button onclick="handleDelete('${pd._id}')">delete</button>
+                `;
+                        container.appendChild(p);
+                    })
+                })
+        }
+
+        loadProduct();
+
+        function updateProduct (id) {
+            fetch(`/upProduct/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                const update = document.getElementById('update');
+                update.innerHTML = `
+                    <p>product id : ${data._id}</p>
+                    </br>
+                    <input type="text" value="${data.price}" name="price"/>
+                    <br/> 
+                    <input type="text" value="${data.quantity}" name="quantity"/>
+                    <br/>
+                    <button>submit</button>
+                `;
+            })
+        }
+
+        function handleDelete (id) {
+            fetch(`/delete/${id}`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(result => {
+                console.log('delete done')
+            })
+        }
+    </script>
+</body>
+
+</html>
